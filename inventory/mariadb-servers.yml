@@ -1,0 +1,4 @@
+mysql:
+  hosts:
+    mysql-1:
+      ansible_host: 89.207.12.134

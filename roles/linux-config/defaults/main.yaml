@@ -1,0 +1,12 @@
+skip_task: false
+work_dir: /opt/mariadb
+mariadb_version: 10.8
+reinstall_mariadb: false
+mariadb_pkgs:
+  - mariadb-server
+  - galera-4
+  - mariadb-client
+  - libmariadb3
+  - mariadb-backup
+  - mariadb-common
+  - python3-pip

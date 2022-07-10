@@ -1,0 +1,6 @@
+---
+- hosts: mysql
+  gather_facts: true
+  roles:
+    - linux-config
+    - mariadb-config
