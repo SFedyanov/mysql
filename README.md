@@ -61,8 +61,9 @@ mariadb_root_password : [password]  ### Mariadb password
 ### configuration
 
 1. Add variable to:
-> templates/90-ansible.cnf.j2
-Like:
+`templates/90-ansible.cnf.j2`
+
+Example:
 ```
 {% if variable is defined and variable|length %}
 max_allowed_packet      = {{ max_allowed_packet }}
@@ -70,10 +71,12 @@ max_allowed_packet      = {{ max_allowed_packet }}
 ```
 
 2. Add varable to:
-> defaults/main.yaml
-/etc/mysql/mariadb.conf.d/90-ansible.cnf
-Like:
-> max_allowed_packet: '32M'
+`defaults/main.yaml`
+
+Example:
+```
+max_allowed_packet: '32M'
+```
 
 3. Check parameter:
 ```sql
@@ -82,10 +85,12 @@ SHOW GLOBAL VARIABLES LIKE 'max_allowed_packet';
 4. This variable will be default for all servers. 
 If require to add specific value to server create server varables file in host_vars folder. As example server name is mysql-1:
 
-> host_vars/mysql-1.yaml
+`host_vars/mysql-1.yaml`
 
 5. Same for group of servers:
-> grop_vars/group_name.yaml
+
+`grop_vars/group_name.yaml`
 
 6. To add variable to all servers exept one just create empty variable for this server:
-> max_allowed_packet: ''
+
+`max_allowed_packet: ''`
