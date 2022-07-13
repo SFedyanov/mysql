@@ -1,0 +1,5 @@
+[mysqld]
+
+{% if variable is defined and variable|length %}
+max_allowed_packet      = {{ max_allowed_packet }}
+{% endif %}

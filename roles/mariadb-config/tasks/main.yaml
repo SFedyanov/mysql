@@ -1,77 +1,18 @@
 ---
+- include: mysql_secure_installation.yml
 
-- name: "Copy .my.cnf file with root password credentials"
+###
+- name: "Copy config file"
   ansible.builtin.template: 
-    src: my.cnf.j2
-    dest: /root/.my.cnf
+    src: 90-ansible.cnf.j2
+    dest: /etc/mysql/mariadb.conf.d/90-ansible.cnf
     owner: root
     group: root
-    mode: '0600'
+    mode: '0644'
   become: yes
+  notify:
+  - Restart Mariadb Service
   when: not skip_task
 
-- name: "Setup root password"
-  community.mysql.mysql_user:
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    name: root
-    password: '{{ mariadb_root_password }}'
-    host_all: true
-  become: yes
-  when: not skip_task
-
-- name: Deletes anonymous MySQL server user for ansible_fqdn
-  community.mysql.mysql_user: 
-    user="" host="{{ ansible_fqdn }}" 
-    state="absent"
-  become: yes
-  when: not skip_task
-
-- name: Deletes anonymous MySQL server user for localhost
-  community.mysql.mysql_user: 
-    user: "" 
-    state: "absent"
-  become: yes
-  when: not skip_task
-
-- name: Secures the MySQL root user for IPV6 localhost (::1)
-  community.mysql.mysql_user: 
-    user: "root"
-    host: "::1" 
-    state: "absent"
-  become: yes
-  when: not skip_task
-
-- name: Secures the MySQL root user for IPV4 localhost (127.0.0.1)
-  community.mysql.mysql_user: 
-    user: "root" 
-    host: "127.0.0.1"
-    state: "absent"
-  become: yes
-  when: not skip_task
-
-- name: Secures the MySQL root user for localhost domain (localhost)
-  community.mysql.mysql_user: 
-    user: "root" 
-    password: "{{ mariadb_root_password }}" 
-    host: "localhost"
-  become: yes
-  when: not skip_task
-
-- name: Secures the MySQL root user for server_hostname domain
-  community.mysql.mysql_user: 
-    user: "root" 
-    password: "{{ mariadb_root_password }}" 
-    host: "{{ ansible_fqdn }}"
-    state: "absent"
-  become: yes
-  when: not skip_task
-
-- name: Removes the MySQL test database
-  community.mysql.mysql_db: 
-    db: test 
-    state: absent
-  become: yes
-  when: not skip_task
-  
 ...
 

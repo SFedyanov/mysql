@@ -1,2 +1,4 @@
 skip_task: false
 mariadb_root_password: 'simple4!'
+
+max_allowed_packet: '32M'
