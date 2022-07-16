@@ -1,6 +1,12 @@
-mysql:
+all:
   hosts:
-    mysql-1:
-      ansible_host: 89.207.12.134
-    mysql-2:
-      ansible_host: 89.207.12.65
+    mysql:
+  children:
+    dbservers:
+      hosts:
+        mysql-1:
+          ansible_host: 89.207.12.134
+          master: true
+        mysql-2:
+          ansible_host: 89.207.12.65
+          master: false
