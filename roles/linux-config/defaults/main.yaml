@@ -1,4 +1,4 @@
-skip_task: false
+skip_task: true
 work_dir: /opt/mariadb
 mariadb_version: 10.8
 reinstall_mariadb: false

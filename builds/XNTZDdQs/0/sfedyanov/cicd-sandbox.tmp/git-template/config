@@ -1,0 +1,6 @@
+[init]
+	defaultBranch = none
+[fetch]
+	recurseSubmodules = false
+[http "https://gitlab.com"]
+	sslCAInfo = /Users/s.fedyanov/work/mysql/builds/XNTZDdQs/0/sfedyanov/cicd-sandbox.tmp/CI_SERVER_TLS_CA_FILE

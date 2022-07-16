@@ -82,8 +82,9 @@ max_allowed_packet: '32M'
 ```sql
 SHOW GLOBAL VARIABLES LIKE 'max_allowed_packet';
 ```
-4. This variable will be default for all servers. 
-If require to add specific value to server create server varables file in host_vars folder. As example server name is mysql-1:
+This variable will be default for all servers. 
+
+4. If require to add specific value to server create server varables file in host_vars folder. As example server name is mysql-1:
 
 `host_vars/mysql-1.yaml`
 
@@ -94,3 +95,27 @@ If require to add specific value to server create server varables file in host_v
 6. To add variable to all servers exept one just create empty variable for this server:
 
 `max_allowed_packet: ''`
+
+### runtime variables
+
+1. Add varable to `runtime_settings` block in `defaults/main.yaml`:
+
+Example:
+```
+runtime_settings:
+  - variable: read_only
+    value: 'OFF'
+  - variable: session_track_transaction_info
+    value: 'OFF'
+```
+This variable will be default for all servers. 
+
+2. If require to add specific value to server create server varables file in host_vars folder. As example server name is mysql-1:
+
+`host_vars/mysql-1.yaml`
+
+3. Same for group of servers:
+
+`grop_vars/group_name.yaml`
+
+### Master-slave replication

@@ -1,1 +1,7 @@
 max_allowed_packet: ''
+
+runtime_settings:
+  - variable: read_only
+    value: 'ON'
+  - variable: session_track_transaction_info
+    value: 'STATE'

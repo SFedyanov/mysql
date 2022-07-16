@@ -1,4 +1,11 @@
-skip_task: false
+skip_task: true
 mariadb_root_password: 'simple4!'
 
 max_allowed_packet: '32M'
+
+runtime_settings:
+  - variable: read_only
+    value: 'OFF'
+  - variable: session_track_transaction_info
+    value: 'OFF'
+  

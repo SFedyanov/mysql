@@ -49,9 +49,8 @@
 
 - name: "Install mariadb packages"
   ansible.builtin.apt:
-    pkg: '{{ item }}'
+    pkg: '{{ mariadb_pkgs }}'
     state: present
-  with_items: '{{ mariadb_pkgs }}' 
   become: yes
   become_user: root
   when: not skip_task

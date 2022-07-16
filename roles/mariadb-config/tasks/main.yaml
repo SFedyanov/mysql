@@ -1,5 +1,5 @@
 ---
-- include: mysql_secure_installation.yml
+- include_tasks: mysql_secure_installation.yml
 
 ###
 - name: "Copy config file"
@@ -14,5 +14,17 @@
   - Restart Mariadb Service
   when: not skip_task
 
+- name: Make runtime settings
+  mysql_variables:
+    variable: "{{ item.variable }}"
+    value: "{{ item.value }}"
+  loop: "{{ runtime_settings }}"
+  become: yes
+  when: not skip_task
+
+- name: Get primary binlog file name and binlog position
+  community.mysql.mysql_replication:
+    mode: getprimary
+  become: yes
 ...
 
