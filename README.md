@@ -119,3 +119,52 @@ This variable will be default for all servers.
 `grop_vars/group_name.yaml`
 
 ### Master-slave replication
+
+Manual way:
+```bash
+#### On master
+
+vim /etc/mysql/mariadb.conf.d/50-server.cnf
+
+bind-address           = 0.0.0.0
+server-id              = 1
+log_bin                = /var/log/mysql/mysql-bin.log
+
+systemctl restart mariadb.service
+
+CREATE USER 'slave'@'172.31.1.82' IDENTIFIED BY 'slave4!';
+GRANT REPLICATION SLAVE ON *.* TO 'slave'@'172.31.1.82';
+FLUSH PRIVILEGES;
+FLUSH TABLES WITH READ LOCK;
+
+SHOW MASTER STATUS;
+
+
+mysqldump --all-databases --master-data > data.sql
+
+scp  data.sql sfedyanov@172.31.1.82:/tmp/
+
+UNLOCK TABLES;
+
+#### On slave
+vim /etc/mysql/mariadb.conf.d/50-server.cnf
+
+bind-address           = 0.0.0.0
+server-id              = 2
+log_bin                = /var/log/mysql/mysql-bin.log
+
+systemctl restart mariadb.service
+
+mysql < data.sql
+
+
+CHANGE MASTER TO MASTER_HOST='172.31.1.81', MASTER_USER='slave', MASTER_PASSWORD='slave4!', MASTER_LOG_FILE='mysql-bin.000001', MASTER_LOG_POS=787;
+
+STOP SLAVE;
+START SLAVE;
+
+on master:
+CREATE DATABASE sampledb;
+on slave: 
+SHOW DATABASES;
+```
