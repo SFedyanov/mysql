@@ -1,5 +1,7 @@
 skip_task: false
 mariadb_root_password: 'simple4!'
+mariadb_slave_password: 'slave4!'
+
 
 max_allowed_packet: '32M'
 
@@ -9,3 +11,4 @@ runtime_settings:
   - variable: session_track_transaction_info
     value: 'STATE'
   
+create_claster: true

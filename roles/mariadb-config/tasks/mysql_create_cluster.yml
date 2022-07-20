@@ -1,0 +1,168 @@
+---
+
+- name: "Set bind-address"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    search_string: 'bind-address'
+    line: "bind-address            = 0.0.0.0"
+  become: yes
+
+- name: "Set server-id"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    search_string: 'server-id'
+    line: "server-id              = 1"
+  become: yes
+  when: master
+
+- name: "Set server-id"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    search_string: 'server-id'
+    line: "server-id              = 2"
+  become: yes
+  when: not master
+
+- name: "Set log_bin"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    search_string: 'log_bin'
+    line: "log_bin                = /var/log/mysql/mysql-bin.log"
+  become: yes
+
+- name: "Restart Mariadb Service"
+  ansible.builtin.service:
+    name: mariadb
+    state: restarted
+  become: yes
+
+- name: "Create user slave"
+  community.mysql.mysql_user: 
+    user: "slave" 
+    password: "{{ mariadb_slave_password }}" 
+    host: "{{ slave_ip }}"
+    state: "present"
+    priv: '*.*:REPLICATION SLAVE'
+  become: yes
+  when: master
+
+- name: "Create user root@slave"
+  community.mysql.mysql_user: 
+    user: "root" 
+    password: "{{ mariadb_root_password }}" 
+    host: "{{ slave_ip }}"
+    state: "present"
+    priv: '*.*:ALL,GRANT'
+  become: yes
+  when: master
+
+- name: "FLUSH PRIVILEGES"
+  ansible.builtin.shell: 'mysql --execute="FLUSH PRIVILEGES;"'
+  become: yes
+  when: master
+
+- name: "FLUSH TABLES WITH READ LOCK"
+  ansible.builtin.shell: 'mysql --execute="FLUSH TABLES WITH READ LOCK;"'
+  become: yes
+  when: master
+ 
+- name: "mysqldump"
+  ansible.builtin.shell: 'mysqldump --all-databases --master-data > {{ work_dir}}/data.sql'
+  become: yes
+  when: master
+ 
+- name: "UNLOCK TABLES"
+  ansible.builtin.shell: 'mysql --execute="UNLOCK TABLES;"'
+  become: yes
+  when: master
+ 
+- name: "save backup from master"
+  ansible.builtin.fetch:
+    src: "{{ work_dir}}/data.sql"
+    dest: /tmp/data.sql
+    flat: yes
+  become: yes
+  when: master
+ 
+- name: "copy backup to slave"
+  ansible.builtin.copy:
+    src: "/tmp/data.sql"
+    dest: "{{ work_dir }}/data.sql"
+  become: yes
+  when: not skip_task
+
+- name: "STOP SLAVE;"
+  ansible.builtin.shell: mysql --execute="STOP SLAVE;"
+  become: yes
+  when: not master
+
+- name: "mysql restore backup"
+  ansible.builtin.shell: 'mysql < {{ work_dir }}/data.sql'
+  become: yes
+  when: not master
+
+- name: Get primary binlog file name and binlog position
+  community.mysql.mysql_replication:
+    mode: getprimary
+    login_host: "{{ master_ip }}"
+    login_user: 'root'
+    login_password: "{{ mariadb_root_password }}"
+  become: yes
+  register: master_params
+  when: not master
+
+- name: Print primary binlog file name and binlog position
+  ansible.builtin.debug:
+    var: master_params.File
+  when: not master
+
+- name: Print primary binlog file name and binlog position
+  ansible.builtin.debug:
+    var: master_params.Position
+  when: not master
+
+- name: "CHANGE MASTER prepare script file"
+  ansible.builtin.template: 
+    src: change-master.sql.j2
+    dest: "{{ work_dir }}/change-master.sql"
+    owner: root
+    group: root
+    mode: '0600'
+  become: yes
+  when: not master
+
+- name: "CHANGE MASTER run script"
+  ansible.builtin.shell: 'mysql < {{ work_dir }}/change-master.sql'
+  become: yes
+  when: not master
+        
+- name: "START SLAVE;"
+  ansible.builtin.shell: mysql --execute="START SLAVE;"
+  become: yes
+  when: not master
+
+- name: "Create a new database with name blablabla"
+  community.mysql.mysql_db:
+    name: blablabla
+    state: present
+  become: yes
+  when: master
+
+- name: "SHOW DATABASES;"
+  ansible.builtin.shell: mysql --execute="SHOW DATABASES;"
+  become: yes
+  register: databases_list
+  when: not master
+
+- name: Print databases_list
+  ansible.builtin.debug:
+    var: databases_list.stdout_lines
+  when: not master
+
+- name: "Remove database with name blablabla"
+  community.mysql.mysql_db:
+    name: blablabla
+    state: absent
+  become: yes
+  when: master
+...

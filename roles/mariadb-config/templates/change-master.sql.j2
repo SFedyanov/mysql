@@ -1,0 +1,1 @@
+CHANGE MASTER TO MASTER_HOST="{{ master_ip }}", MASTER_USER="slave", MASTER_PASSWORD="{{ mariadb_slave_password }}", MASTER_LOG_FILE="{{ master_params.File }}", MASTER_LOG_POS={{ master_params.Position }};
