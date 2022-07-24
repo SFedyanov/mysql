@@ -1,14 +1,14 @@
 ---
 
-- include_tasks: mysql_secure_installation.yml
+- include_tasks: mysql_secure_installation.yaml
   when: not skip_task
-- include_tasks: mysql_change_settings.yml
+- include_tasks: mysql_change_settings.yaml
   when: not skip_task
-- include_tasks: mysql_create_cluster.yml
+- include_tasks: mysql_create_cluster.yaml
   when: create_claster
-- include_tasks: mysql_users_management.yml
+- include_tasks: mysql_users_management.yaml
   when: not skip_task
-- include_tasks: mysql_cron_management.yml
+- include_tasks: mysql_cron_management.yaml
   # when: not skip_task
 
 ...

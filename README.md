@@ -17,6 +17,33 @@
 # How to use
 ## inventory/mariadb-servers.yaml
 Add correct information about your infrastructure
+
+Example:
+```yaml
+all:
+  hosts:
+    mysql:
+  children:
+    dbservers:
+      hosts:
+        mysql-1:
+          ansible_host: 84.201.166.234
+          master: true
+        mysql-2:
+          ansible_host: 84.252.140.154
+          master: false
+      vars:
+        master_ip: 10.129.0.81
+        slave_ip: 10.129.0.82
+```
+`ansible_host:` - Server external IP
+
+`master_ip`     - Cluster master IP
+
+`slave_ip`      - Cluster slave IP
+
+`master`        - true or false
+
 ## ansible.cfg
 Change remote_user to your user.
 This user has to be able to connect to servers by SSH using SSH key.
@@ -49,7 +76,9 @@ Configure mariadb service
 Variables:
 ```yaml
 skip_task: true                     ### skip task for speed up development. Should be 'false' to make it work
-mariadb_root_password : [password]  ### Mariadb password
+mariadb_root_password : [password]  ### Mariadb root password
+mariadb_slave_password: [password]  ### Mariadb slave password
+create_claster: true                ### create cluster true or false
 ```
 
 ### mysql_secure_installation
@@ -71,7 +100,7 @@ max_allowed_packet      = {{ max_allowed_packet }}
 ```
 
 2. Add varable to:
-`defaults/main.yaml`
+`defaults/cnf.yaml`
 
 Example:
 ```
@@ -98,7 +127,7 @@ This variable will be default for all servers.
 
 ### runtime variables
 
-1. Add varable to `runtime_settings` block in `defaults/main.yaml`:
+1. Add varable to `runtime_settings` block in `defaults/runtime_settings.yaml`:
 
 Example:
 ```
@@ -119,6 +148,19 @@ This variable will be default for all servers.
 `grop_vars/group_name.yaml`
 
 ### Master-slave replication
+
+Add to inventory:
+
+`master_ip`     - Cluster master IP
+
+`slave_ip`      - Cluster slave IP
+
+`master`        - true or false
+
+Add to `defaults/main.yaml`
+```
+create_claster: true   
+```
 
 Manual way:
 ```bash
@@ -168,3 +210,67 @@ CREATE DATABASE sampledb;
 on slave: 
 SHOW DATABASES;
 ```
+
+### User management:
+
+1. Add to `defaults\users.yaml`
+
+```
+---
+users:
+  - user: 'sfedynov'
+    password: 'passwd1234!'
+    host: 'localhost'
+    state: 'present'
+    priv: '*.*:ALL,GRANT'
+  - user: 'jack'
+    password: 'passwd1234!'
+    host: 'localhost'
+    state: 'present'
+    priv: '*.*:ALL,GRANT'
+...
+```
+2. To remove user just chang `state:` to `'absent'`
+
+3. This users wii be added to all servers. 
+
+4. If require to add user to certain server - create server varables file in host_vars folder. As example server name is mysql-1:
+
+`host_vars/mysql-1.yaml`
+
+5. Same for group of servers:
+
+`grop_vars/group_name.yaml`
+
+### Cron tasks management:
+
+1. Add to `defaults\cron_tasks.yaml`
+
+```
+cron_tasks:
+  - name: "check dirs"
+    minute: "0"
+    hour: "5,2"
+    day: "*"
+    month: "*"
+    job: "ls -alh > /dev/null"
+    state: "present"
+  - name: "check dirs 2"
+    minute: "0"
+    hour: "5,2"
+    day: "*"
+    month: "*"
+    job: "ls -alh > /dev/null"
+    state: "absent"
+```
+2. To remove task just chang `state:` to `'absent'`
+
+3. This tasks wii be added to all servers. 
+
+4. If require to add task to certain server - create server varables file in host_vars folder. As example server name is mysql-1:
+
+`host_vars/mysql-1.yaml`
+
+5. Same for group of servers:
+
+`grop_vars/group_name.yaml`
