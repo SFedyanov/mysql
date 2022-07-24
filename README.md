@@ -1,6 +1,6 @@
 # Infrastructure
 ## My test servers:
-* mysql-1 89.207.12.134 ### Ubuntu 22.04
+### Ubuntu 22.04
 
 # Task
 ```
