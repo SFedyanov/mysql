@@ -1,0 +1,4 @@
+skip_task: true
+mariadb_root_password: 'simple4!'
+mariadb_slave_password: 'slave4!'  
+create_claster: false

@@ -1,0 +1,14 @@
+---
+
+- name: "Create user root@slave"
+  community.mysql.mysql_user: 
+    user: "{{ item.user }}" 
+    password: "{{ item.password }}" 
+    host: "{{ item.host }}"
+    state: "{{ item.state }}"
+    priv: "{{ item.priv }}"
+  loop: "{{ users }}"
+  become: yes
+  when: master
+
+...

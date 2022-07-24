@@ -5,10 +5,10 @@ all:
     dbservers:
       hosts:
         mysql-1:
-          ansible_host: 51.250.103.119
+          ansible_host: 84.201.166.234
           master: true
         mysql-2:
-          ansible_host: 51.250.108.99
+          ansible_host: 84.252.140.154
           master: false
       vars:
         master_ip: 10.129.0.81

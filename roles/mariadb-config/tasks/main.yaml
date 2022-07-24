@@ -6,6 +6,10 @@
   when: not skip_task
 - include_tasks: mysql_create_cluster.yml
   when: create_claster
+- include_tasks: mysql_users_management.yml
+  when: not skip_task
+- include_tasks: mysql_cron_management.yml
+  # when: not skip_task
 
 ...
 

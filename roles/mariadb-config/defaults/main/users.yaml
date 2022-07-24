@@ -1,0 +1,13 @@
+---
+users:
+  - user: 'sfedynov'
+    password: 'passwd1234!'
+    host: 'localhost'
+    state: 'present'
+    priv: '*.*:ALL,GRANT'
+  - user: 'jack'
+    password: 'passwd1234!'
+    host: 'localhost'
+    state: 'present'
+    priv: '*.*:ALL,GRANT'
+...
