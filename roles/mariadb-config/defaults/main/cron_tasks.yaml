@@ -1,0 +1,19 @@
+---
+
+cron_tasks:
+  - name: "check dirs"
+    minute: "0"
+    hour: "5,2"
+    day: "*"
+    month: "*"
+    job: "ls -alh > /dev/null"
+    state: "present"
+  - name: "check dirs 2"
+    minute: "0"
+    hour: "5,2"
+    day: "*"
+    month: "*"
+    job: "ls -alh > /dev/null"
+    state: "absent"
+
+...
